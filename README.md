@@ -16,6 +16,14 @@ Include the files below in one folder :
 * FINAL_RESULT.txt
 * XSPID3R.py
 
+Make Sure The Modules Below Are Installed If NOT > use this command to install one : pip install [module name] 
+
+* requests
+* re
+* argparse
+* BeautifulSoup
+* SoupStrainer
+
 # XSPID3R USAGE : 
 
 * python XSPID3R.py --search example.com > Look for example.com in Dnsdumpster .
