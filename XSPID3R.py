@@ -2,13 +2,10 @@
 # By MOHAMMED ADEL
 # Twitter : @moh_security
 
-import requests
-import re
-import argparse
-client = requests.session()
-from bs4 import BeautifulSoup, SoupStrainer
-
-
+import requests # pip install requests 
+import re # pip install re
+import argparse # pip install argparse 
+from bs4 import BeautifulSoup, SoupStrainer # pip install BeautifulSoup | pip install SoupStrainer
 
 
 def prRed(prt): print("\033[91m {}\033[00m" .format(prt))
@@ -50,7 +47,7 @@ parser.add_argument("-a", "--author", type=str, help="-a show OR --author show")
 args = parser.parse_args()
 
 
-
+client = requests.session()
 GET_URL_VCOMM = args.search
 GET_BACKUO_URL = args.backup
 
@@ -126,8 +123,6 @@ if args.search:
     PRINT_FINAL_URLSS.write("[+] Scan Report : "+S_REPORT)
     PRINT_FINAL_URLSS.write("\n")
 
-    
-
     if Choice_TO_SRESULT == "y" or Choice_TO_SRESULT == "Y":
         for line in Final_Result:
             if URL_TARGET in line:
@@ -146,11 +141,6 @@ if args.search:
         prGreen("[INFO] python XSPID3R.py --backup examples.com \n")
         print "\n"
 
-
-
-
-
-
 elif args.backup:
     Search_FILE = open('FINAL_RESULT.txt', 'r')
     FILE_DATA = Search_FILE.readlines()
@@ -158,14 +148,10 @@ elif args.backup:
     for line in FILE_DATA:
         if GET_BACKUO_URL in line:
             prGreen(line)
-
-            
-
-            
+ 
 elif args.author:
     prPurple("[+] Author : MOHAMMED ADEL\n")
     prPurple("[+] Twitter : @moh_security\n")
     prPurple("[+] Github : github.com/inurlx\n")
     exit()
-
 
