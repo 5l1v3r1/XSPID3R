@@ -2,9 +2,9 @@
 # By MOHAMMED ADEL
 # Twitter : @moh_security
 
-import requests # pip install requests 
+import requests # pip install requests
 import re # pip install re
-import argparse # pip install argparse 
+import argparse # pip install argparse
 from bs4 import BeautifulSoup, SoupStrainer # pip install BeautifulSoup | pip install SoupStrainer
 
 
@@ -17,31 +17,32 @@ def prCyan(prt): print("\033[96m {}\033[00m" .format(prt))
 prRed (
     '''
 ****************************************
-                  :                        
-                  :                      
-       ,,         :         ,,               
-       ::         :         ::             
-,,     ::         :         ::     ,,      
-::     ::         :         ::     ::      
- '::.   '::.      :      .::'   .::'          
-    '::.  '::.  _/~\_  .::'  .::'       
-      '::.  :::/     \:::  .::'        
-        ':::::(       ):::::'         
-               \ ___ /                  
-         .:::::/`   `\:::::.           
-       .::'   .:\o o/:.   '::.        
-     .::'   .::  :":  ::.   '::.            
-   .::'    ::'   ' '   '::    '::.      
-  ::      ::             ::      ::    
-  ^^      ::             ::      ^^   
-          ::             ::             
-          ^^             ^^      
+                  :
+                  :
+       ,,         :         ,,
+       ::         :         ::
+,,     ::         :         ::     ,,
+::     ::         :         ::     ::
+ '::.   '::.      :      .::'   .::'
+    '::.  '::.  _/~\_  .::'  .::'
+      '::.  :::/     \:::  .::'
+        ':::::(       ):::::'
+               \ ___ /
+         .:::::/`   `\:::::.
+       .::'   .:\o o/:.   '::.
+     .::'   .::  :":  ::.   '::.
+   .::'    ::'   ' '   '::    '::.
+  ::      ::             ::      ::
+  ^^      ::             ::      ^^
+          ::             ::
+          ^^             ^^
     '''
 )
 
 
 parser = argparse.ArgumentParser(description="[+] XSPID3R is a tool that uses DNSDUMPSTER To Scan specific TARGETS.[+]")
 parser.add_argument("-s", "--search", type=str, help="-s example.com OR --search example.com")
+parser.add_argument("-sl", "--search_list", type=str, help="-sl LIST.txt OR --search_list LIST.txt")
 parser.add_argument("-b", "--backup", type=str, help="-b example.com OR --backup example.com")
 parser.add_argument("-a", "--author", type=str, help="-a show OR --author show")
 args = parser.parse_args()
@@ -54,7 +55,7 @@ GET_BACKUO_URL = args.backup
 if args.search:
     URL_TARGET = GET_URL_VCOMM
     URL = 'https://dnsdumpster.com/'
-    client.get(URL) 
+    client.get(URL)
     csrftoken = client.cookies['csrftoken']
     payload = {
     'targetip':URL_TARGET,
@@ -103,14 +104,14 @@ if args.search:
     DNS_PRINT_OUT = open('DNS_FFR.txt', 'r+b')
 
     Final_Result = DNS_PRINT_OUT.readlines()
-    
+
     prCyan("[+] TARGET : "+URL_TARGET)
     prCyan("[+] CSRF TOKEN : "+csrftoken)
 
 
     for line in Final_Result:
         if "https://dnsdumpster.com/static/xls/" in line:
-            S_REPORT = line 
+            S_REPORT = line
             prCyan("[+] Scan Report : "+S_REPORT)
 
 
@@ -148,10 +149,100 @@ elif args.backup:
     for line in FILE_DATA:
         if GET_BACKUO_URL in line:
             prGreen(line)
- 
+
+elif args.search_list:
+    FILE_CONTAINS_LIST = args.search_list
+    SEARCH_LIST = open(FILE_CONTAINS_LIST)
+    FILE_URLS = SEARCH_LIST.readlines()
+    prPurple("[-] Scanning ...")
+    for url_line in FILE_URLS:
+        url_line = url_line.replace('\n','')
+        URL_TARGET = GET_URL_VCOMM
+        URL = 'https://dnsdumpster.com/'
+        client.get(URL)
+        csrftoken = client.cookies['csrftoken']
+        payload = {
+        'targetip':url_line,
+        'csrfmiddlewaretoken':csrftoken
+        }
+        DNS_FILE = open('DNS_RESP.txt','w')
+
+
+        r = client.post(URL, data=payload, headers=dict(Referer=URL))
+
+        DNS_FILE.write(r.text)
+        DNS_FILE.close()
+
+        DNS_LINKS = open('DNS_LINKS.txt', 'w')
+
+
+        scan1 =  open('DNS_RESP.txt', 'r')
+        soup = BeautifulSoup(scan1, "lxml")
+        for link1 in soup.findAll('a', attrs={'href': re.compile('((http|https)s?://.*?)')}):
+            DNS_LINKS.write(link1.get('href'))
+            DNS_LINKS.write("\n")
+
+
+        DNS_LINKS.close()
+
+        FIND_RE_URLS = open('DNS_LINKS.txt', 'r')
+
+        ReadDATA = FIND_RE_URLS.readlines()
+
+
+        FIND_RE_URLS.close()
+
+
+        DNS_FILTER_LINKS = open('DNS_LINKS.txt', 'r')
+        DNS_FFR_LINKS = open('DNS_FFR.txt', 'w')
+
+        FilterDATA = DNS_FILTER_LINKS.readlines()
+
+        for line in FilterDATA:
+            DNS_FFR_LINKS.write(line.rpartition('?q=')[2])
+
+        DNS_FFR_LINKS.close()
+        DNS_FILTER_LINKS.close()
+
+
+        DNS_PRINT_OUT = open('DNS_FFR.txt', 'r+b')
+
+        Final_Result = DNS_PRINT_OUT.readlines()
+        print"\n"
+        for line in Final_Result:
+            if "https://dnsdumpster.com/static/xls/" in line:
+                S_REPORT = line
+                prCyan("---------------------------------------------------------------------------------")
+                prCyan("[+] TARGET : "+url_line)
+                prCyan("[+] CSRF TOKEN : "+csrftoken)
+                prCyan("[+] Scan Report : "+S_REPORT)
+                prCyan("---------------------------------------------------------------------------------")
+
+
+        PRINT_FINAL_URLSS = open('FINAL_RESULT.txt', 'a')
+        for line in Final_Result:
+            if url_line in line:
+                PRINT_FINAL_URLSS.write(line)
+
+        PRINT_FINAL_URLSS.write("[+] TARGET : "+url_line)
+        PRINT_FINAL_URLSS.write("\n")
+        PRINT_FINAL_URLSS.write("[+] CSRF TOKEN : "+csrftoken)
+        PRINT_FINAL_URLSS.write("\n")
+        PRINT_FINAL_URLSS.write("[+] Scan Report : "+S_REPORT)
+        PRINT_FINAL_URLSS.write("\n")
+
+
+
+    print "\n"
+    prGreen("[INFO] DATA SAVED IN FILE [FINAL_RESULT.txt] \n")
+    prGreen("[INFO] To View The Result Of Targets Scanned.USE The Command Below : \n")
+    prGreen("[INFO] python XSPID3R.py --backup [TARGET's_URL] \n")
+    print "\n"
+
+
+
 elif args.author:
     prPurple("[+] Author : MOHAMMED ADEL\n")
     prPurple("[+] Twitter : @moh_security\n")
     prPurple("[+] Github : github.com/inurlx\n")
     exit()
-
